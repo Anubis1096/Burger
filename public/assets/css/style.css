@@ -7,10 +7,10 @@ hr {
     margin: 1rem 0;
 }
   
-.is-brown,
-.is-brown:hover,
-.is-brown:focus,
-.is-brown:active {
+.is-yellow,
+.is-yellow:hover,
+.is-yellow:focus,
+.is-yellow:active {
     color: yellow;
     background-color: dodgerblue;
     border-color: transparent;
