@@ -1,0 +1,121 @@
+<div class="columns is-centered mb-4">
+  <div class="column is-half has-text-centered">
+    <img src="/assets/img/burger.png" alt="Burger">
+    <h1 class="title is-1 has-text-centered has-text-warning">Burger Time!</h1>
+    <p class="has-text-white">Click a green button to eat a burger. Click a red
+      burger button to prepare a new one. Create a new burger by filling out the burger name and clicking the yellow burger button.</p>
+  </div>
+</div>
+
+
+
+<div class="columns is-centered">
+  <div class="column is-5 has-text-right" id="eat-column">
+    <h2 class="subtitle has-text-weight-bold has-text-white">Ready to Eat</h2>
+    <hr>
+    <ul>
+      {{#each burgers}}
+      {{#unless devoured}}
+      <li class="mb-1 has-text-white">{{burger_name}} <button class="button is-success is-small is-rounded change-status"
+          data-id="{{id}}" data-status="{{devoured}}">
+          <span class="icon">
+            <i class="fas fa-utensils"></i>
+          </span></button></li>
+      {{/unless}}
+      {{/each}}
+    </ul>
+  </div>
+
+  <div class="column is-1"></div>
+
+  <div class="column is-5 has-text-left" id="eaten-column">
+    <h2 class="subtitle has-text-weight-bold has-text-white">Eaten</h2>
+    <hr>
+    <ul>
+      {{#each burgers}}
+      {{#if devoured}}
+      <li class="mb-1"><button class="button is-danger is-small is-rounded change-status" data-id="{{id}}"
+          data-status="{{devoured}}"><span class="icon">
+            <i class="fas fa-heartbeat"></i>
+          </span></button> <span class="has-text-white">{{burger_name}}</span>
+      </li>
+      {{/if}}
+      {{/each}}
+    </ul>
+  </div>
+</div>
+
+<div class="columns is-centered mt-4">
+  <div class="column">
+    <h4 class="title is-4 has-text-centered ma has-text-white">Add a Burger</h4>
+    <p class="help has-text-centered has-text-white">Create a burger of your choosing</p>
+  </div>
+</div>
+
+<div class="columns is-centered has-text-centered">
+  <div class="column is-3">
+    <form class="create-burger field is-grouped">
+      <p class="control is-expanded ma">
+        <input class="input" type="text" id="newBurger" name="name">
+      </p>
+      <div class="control has-text-centered">
+        <button class="button is-brown is-large is-rounded" id="new-burger" type="submit">
+          <span class="icon is-large">
+            <i class="fas fa-hamburger"></i>
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  $(function () {
+    $(".change-status").on("click", function (event) {
+      let id = $(this).data("id");
+      let status = $(this).data("status");
+      let newStatus = {
+        devoured: status === 0 ? 1 : 0    // Ternary operator enables same click listener to switch devour status
+      };
+      $.ajax("/api/burgers/" + id, {
+        type: "PUT",
+        data: newStatus
+      }).then(
+        function () {
+          location.reload();
+        }
+      );
+    });
+    $(".create-burger").on("submit", function (event) {
+      event.preventDefault();
+      let burgerName = $("#newBurger").val().trim()
+      if (burgerName == "") {
+        $('#new-burger').effect('shake')
+      } else {
+        let newBurger = {
+          burger_name: burgerName,
+          devoured: 0
+        };
+        $.ajax("/api/burgers", {
+          type: "POST",
+          data: newBurger
+        }).then(
+          function () {
+            location.reload();
+          }
+        );
+      }
+    });
+  });
+  $(window).resize(function () {
+    if (window.innerWidth < 769) {
+      $("#eat-column").removeClass("has-text-right")
+      $("#eaten-column").removeClass("has-text-left");
+      $("#eaten-column, #eat-column").addClass("has-text-centered");
+    } else {
+      $("#eat-column").addClass("has-text-right")
+      $("#eaten-column").addClass("has-text-left");
+      $("#eaten-column", "#eat-column").removeClass("has-text-centered");
+    }
+  });
+</script>
